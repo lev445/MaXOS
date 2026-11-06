@@ -26,8 +26,7 @@ typedef struct {
 static cmd_t cmds[MAX_CMDS];
 static int ncmds;
 
-void shell_register(const char *name, const char *help, shell_cmd_fn fn)
-{
+void shell_register(const char *name, const char *help, shell_cmd_fn fn) {
     if (ncmds < MAX_CMDS) {
         cmds[ncmds].name = name;
         cmds[ncmds].help = help;
@@ -274,7 +273,7 @@ static int c_cat(int argc, char **argv) {
                     kprintf("%c", ((char *)file->data)[i]);
                 kprintf("\n");
             } else {
-                kprintf("(empty)\n");
+                kprintf("\n");
             }
             return 0;
         }

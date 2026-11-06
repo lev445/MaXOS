@@ -12,6 +12,7 @@
 #include "panic.h"
 #include "heap.h"
 #include "pmm.h"
+#include "drivers/blk/atapio.h"
 
 extern uint8_t _initramfs_start[];
 extern uint8_t _initramfs_end[];
@@ -54,7 +55,7 @@ void kmain(void) {
     ps2_init();
     vfs_init();
     initramfs_parse();
-
+	ata_init();
     sti();
 
     shell_banner();
