@@ -1,0 +1,10 @@
+*.o
+*.bin
+*.img
+*.elf
+*.log
+*.lst
+os.img
+kernel.bin
+boot.bin
+stage2.bin
