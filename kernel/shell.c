@@ -511,16 +511,8 @@ static int c_fsstub(int argc, char **argv)
     return 1;
 }
 
-static const char *banner_art[5] = {
-    " __  __      __  _____  ____",
-    "|  \\/  | __ _\\ \\/ / _ \\/ ___|",
-    "| |\\/| |/ _` |\\  / | | \\___ \\",
-    "| |  | | (_| |/  \\ |_| |___) |",
-    "|_|  |_|\\__,_/_/\\_\\___/|____/",
-};
-static const char *banner_side[2] = {
-	"Welcome to MaXOS."
-	" "
+static const char *banner_art[1] = {
+	"MaXOS is booted..."
 };
 
 static int cmd_lscpu(int argc, char **argv)
@@ -585,81 +577,17 @@ static int cmd_lscpu(int argc, char **argv)
 }
 void shell_banner(void)
 {
-    console_set_color(COL_LCYAN, COL_BLACK);
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 1; i++) {
         int x, y;
         console_get_cursor(&x, &y);
         console_puts(banner_art[i]);
         if (i < 2) {
             console_set_cursor(32, y);
-            console_puts(banner_side[i]);
+            //console_puts(banner_side[i]);
         }
         console_putc('\n');
     }
     console_set_color(COL_LGRAY, COL_BLACK);
-}
-
-int c_vfs_test(int argc, char **argv) {
-    char wbuf[64] = "Hello, MaXOS VFS!\n";
-    char rbuf[64] = {0};
-    int ret;
-    
-    kprintf("=== VFS TEST START ===\n");
-    
-    // Тест записи
-    kprintf("Writing to /test.txt...\n");
-    ret = vfs_write("/test.txt", wbuf, strlen(wbuf));
-    kprintf("vfs_write returned: %d\n", ret);
-    
-    // Тест чтения
-    kprintf("Reading from /test.txt...\n");
-    ret = vfs_read("/test.txt", rbuf, sizeof(rbuf) - 1);
-    kprintf("vfs_read returned: %d\n", ret);
-    kprintf("Data: %s\n", rbuf);
-    
-    // Проверка, что данные совпадают
-    if (strcmp(wbuf, rbuf) == 0) {
-        kprintf("SUCCESS: Data matches!\n");
-    } else {
-        kprintf("FAIL: Data mismatch!\n");
-        kprintf("Expected: %s\n", wbuf);
-        kprintf("Got: %s\n", rbuf);
-    }
-    
-    // Edge cases
-    kprintf("\n=== EDGE CASES ===\n");
-    
-    // Чтение несуществующего файла
-    ret = vfs_read("/nonexistent.txt", rbuf, sizeof(rbuf));
-    kprintf("Read nonexistent: %d (expected negative)\n", ret);
-    
-    // Запись с размером 0
-    ret = vfs_write("/test.txt", wbuf, 0);
-    kprintf("Write size 0: %d\n", ret);
-    
-    // Чтение с размером 0
-    ret = vfs_read("/test.txt", rbuf, 0);
-    kprintf("Read size 0: %d\n", ret);
-    
-    kprintf("=== VFS TEST END ===\n");
-    return 0;
-}
-
-static int c_testfs(int argc, char **argv) {
-    (void)argc;
-    (void)argv;
-    
-    const char *content = "Hello from dynamic MaXOS VFS!\nThis file was created at runtime!\n";
-    uint32_t len = 0;
-    while (content[len] != '\0') len++; // strlen
-    
-    int res = vfs_write("runtime_test.txt", content, len);
-    if (res > 0) {
-        kprintf("Success! Wrote %d bytes to 'runtime_test.txt'\n", res);
-    } else {
-        kprintf("Failed to write file.\n");
-    }
-    return 0;
 }
 
 void shell_init(void)
@@ -684,10 +612,8 @@ void shell_init(void)
     shell_register("lscpu", "print CPU information", cmd_lscpu);
     shell_register("lsmem", "show memory map", c_lsmem);
     shell_register("free", "show ram", c_free);
-    shell_register("vfs_test", "test vfs", c_vfs_test);
     shell_register("ls", "list files", c_ls);
     shell_register("cat", "show file contents", c_cat);
-    shell_register("test", "test write", c_testfs);
 }
 
 void shell_run(void)
