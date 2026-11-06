@@ -36,6 +36,7 @@ SECTIONS
         *(.bss)
         *(.bss.*)
         *(COMMON)
+        . = ALIGN(4096);
         . = ALIGN(8);
         __bss_end = .;
     } :data

@@ -331,8 +331,6 @@ get_e820_map:
     xor esi, esi
     xor bp, bp
     mov edx, 0x534D4150
-    
-    ; DEBUG: вывести строку через порт 0xE9
     mov si, msg_e820_debug
     call debug_print
     
@@ -364,32 +362,24 @@ get_e820_map:
     call debug_print
 
 .e820_done:
-    ; DEBUG: показать количество entries
     mov si, msg_e820_count
     call debug_print
-    
-    ; Вывести bp в hex через 0xE9
     mov ax, bp
     call debug_print_hex16
-    
-    ; Вывести CR+LF
     mov al, 13
     out 0xE9, al
     mov al, 10
     out 0xE9, al
-    
-    ; Сохраняем e820_count (ИСПРАВЛЕНО!)
     mov ax, 0x3000
     mov es, ax
     mov di, BOOTINFO_ADDR & 0xFFFF
     add di, BI_E820_COUNT
-    movzx eax, bp          ; используем eax вместо ebp
-    mov dword [es:di], eax ; явно указываем сегмент es
+    movzx eax, bp
+    mov dword [es:di], eax
     
     popad
     ret
 
-; Вывод строки через порт 0xE9
 debug_print:
     pusha
 .dp_loop:

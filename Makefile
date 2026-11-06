@@ -75,6 +75,6 @@ debug: os.img
 
 # clean *.object files and kernel bin
 clean:
-	rm -f *.bin *.o *.img kernel.elf qemu.log kernel/*.o
+	rm -f *.bin *.o *.img kernel.elf qemu.log kernel/*.o *.lst
 
 .PHONY: all run log debug clean

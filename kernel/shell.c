@@ -10,6 +10,7 @@
 #include "font.h"
 #include "cpuid.h"
 #include "vfs.h"
+#include "pmm.h"
 
 #define PROMPT     "# "
 #define MAX_CMDS   48
@@ -333,35 +334,20 @@ static int c_lsmem(int argc, char **argv) {
     return 0;
 }
 
-static int c_free(int argc, char **argv)
-{
-    (void)argc; (void)argv;
-    
-    const boot_info_t *bi = (const boot_info_t *)(uintptr_t)BOOTINFO_ADDR;
-    
-    if (bi->e820_count == 0) {
-        kprintf("no memory map available\n");
-        return 1;
-    }
-    
-    uint64_t total_available = 0;
-    uint64_t total_reserved = 0;
-    
-    for (uint32_t i = 0; i < bi->e820_count; i++) {
-        const e820_entry_t *e = &bi->e820[i];
-        if (e->type == 1)
-            total_available += e->length;
-        else
-            total_reserved += e->length;
-    }
-    
-    uint64_t total_mb = (total_available + total_reserved) / (1024 * 1024);
-    uint64_t avail_mb = total_available / (1024 * 1024);
-    
-    kprintf("Total RAM:     %lu MiB\n", (unsigned long)total_mb);
-    kprintf("Available:     %lu MiB\n", (unsigned long)avail_mb);
-    kprintf("Reserved:      %lu MiB\n", (unsigned long)(total_mb - avail_mb));
-    
+static int c_free(int argc, char **argv) {
+    (void)argc; 
+    (void)argv;
+
+    uint64_t total = 0, used = 0, free = 0;
+    pmm_get_stats(&total, &used, &free);
+    uint64_t total_mb = total / (1024 * 1024);
+    uint64_t used_mb = used / (1024 * 1024);
+    uint64_t free_mb = free / (1024 * 1024);
+    uint64_t available_mb = free_mb;
+    kprintf("[total used free available]\n");
+    kprintf("Mem: %lu %lu %lu %lu\n",
+            total_mb, used_mb, free_mb, available_mb);
+
     return 0;
 }
 
@@ -659,6 +645,23 @@ int c_vfs_test(int argc, char **argv) {
     return 0;
 }
 
+static int c_testfs(int argc, char **argv) {
+    (void)argc;
+    (void)argv;
+    
+    const char *content = "Hello from dynamic MaXOS VFS!\nThis file was created at runtime!\n";
+    uint32_t len = 0;
+    while (content[len] != '\0') len++; // strlen
+    
+    int res = vfs_write("runtime_test.txt", content, len);
+    if (res > 0) {
+        kprintf("Success! Wrote %d bytes to 'runtime_test.txt'\n", res);
+    } else {
+        kprintf("Failed to write file.\n");
+    }
+    return 0;
+}
+
 void shell_init(void)
 {
     shell_register("help",    "list commands", c_help);
@@ -684,6 +687,7 @@ void shell_init(void)
     shell_register("vfs_test", "test vfs", c_vfs_test);
     shell_register("ls", "list files", c_ls);
     shell_register("cat", "show file contents", c_cat);
+    shell_register("test", "test write", c_testfs);
 }
 
 void shell_run(void)
