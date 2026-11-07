@@ -26,7 +26,8 @@ stage2.bin: boot/stage2.asm
 #	nasm -f elf64 $< -o $@
 
 KASM_OBJS = kernel/crt0.o kernel/isr.o kernel/initramfs_.o
-KC_OBJS   = $(patsubst %.c,%.o,$(wildcard kernel/*.c))
+C_SOURCES = $(shell find kernel -name "*.c")
+KC_OBJS = $(patsubst %.c,%.o,$(C_SOURCES))
 KOBJS     = $(KASM_OBJS) $(KC_OBJS)
 
 kernel/%.o: kernel/%.asm

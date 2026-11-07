@@ -9,7 +9,6 @@
 #define PS2_STATUS 0x64
 #define PS2_CMD    0x64
 
-/* ---------- низкоуровневый доступ к контроллеру 8042 ---------- */
 static int ps2_wait_write(void)
 {
     for (int i = 0; i < 100000; i++)
@@ -29,7 +28,6 @@ static void ps2_data(uint8_t c)  { ps2_wait_write(); outb(PS2_DATA, c); }
 static uint8_t ps2_resp(void)    { ps2_wait_read();  return inb(PS2_DATA); }
 static void mouse_cmd(uint8_t c) { ps2_cmd(0xD4); ps2_data(c); }
 
-/* ---------- кольцевой буфер клавиатуры ---------- */
 #define KBUF 256
 static uint8_t kbuf[KBUF];
 static volatile unsigned khead, ktail;
@@ -56,7 +54,6 @@ int kbd_getchar(void)
     return c;
 }
 
-/* ---------- таблицы scancode set 1 ---------- */
 static const char map_norm[0x54] = {
     [0x01] = 27,
     [0x02] = '1', [0x03] = '2', [0x04] = '3', [0x05] = '4', [0x06] = '5',
@@ -154,7 +151,6 @@ static void kbd_irq(void)
     kbd_push((uint8_t)c);
 }
 
-/* ---------- мышь ---------- */
 static int mouse_on;
 static uint8_t mcycle;
 static uint8_t mpkt[3];
