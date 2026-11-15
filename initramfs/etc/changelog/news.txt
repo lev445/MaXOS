@@ -1,0 +1,13 @@
+MaXOS news. Added at: 11/11/26.
+Changed at: 11/11/26.
+
+-- prefixes:
+--- rc: release candidate.
+--- b: beta.
+--- a: alpha.
+--- r: release.
+
+-- format:
+version-change-github-release
+
+0.1.0-r - release - ****

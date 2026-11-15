@@ -1,0 +1,78 @@
+#include "types.h"
+#include "console.h"
+#include "arch/x86_64/idt.h"
+#include "arch/x86_64/lib/pic.h"
+#include "pit.h"
+#include "ps2.h"
+#include "shell.h"
+#include "printf.h"
+#include "arch/x86_64/lib/io.h"
+#include "vfs.h"
+#include "initramfs.h"
+#include "panic.h"
+#include "heap.h"
+#include "pmm.h"
+#include "drivers/blk/atapio.h"
+#include "fs/ext/ext2.h"
+#include "arch/x86_64/tss.h"
+#include "arch/x86_64/lib/msr.h"
+#include "arch/x86_64/entry/entryX64.h"
+
+extern uint8_t _initramfs_start[];
+extern uint8_t _initramfs_end[];
+
+static void debug_puts(const char *s) {
+    while (*s) outb(0xE9, *s++);
+}
+
+void kmain(void) {
+    const boot_info_t *bi = (const boot_info_t *)(uintptr_t)BOOTINFO_ADDR;
+    uint32_t initramfs_size = (uint32_t)(_initramfs_end - _initramfs_start);
+    
+    if (initramfs_size >= 6) {
+        //debug_puts("[kernel] CPIO magic bytes: ");
+        //for (int i = 0; i < 6; i++) {
+           //outb(0xE9, _initramfs_start[i]);
+        //}
+        //debug_puts("\n");
+
+        if (_initramfs_start[0] == '0' && _initramfs_start[1] == '7' &&
+            _initramfs_start[2] == '0' && _initramfs_start[3] == '7' &&
+            _initramfs_start[4] == '0' && _initramfs_start[5] == '1') {
+            kprintf("Cpio ok\n");
+        } else {
+            panic("The 'CPIO' archive is invalid.");
+        }
+    } else {
+        panic("Initramfs is too small to be valid.");
+    }
+    pmm_init(128 * 1024 * 1024);
+    heap_init();
+    ata_init();
+    ext2_scan_all();
+    console_init(bi);
+    if (!console_ready()) {
+        panic("Cannot init console.");
+    }
+
+    idt_init();
+    pic_init();
+    pit_init();
+    ps2_init();
+    vfs_init();
+    initramfs_parse();
+    sti();
+    tss_init();
+    syscall_init();
+    //kprintf("\033[31mRED\033[0m\n");
+    //kprintf("\033[32mGREEN\033[0m\n");
+    //kprintf("\033[34mBLUE\033[0m\n");
+    shell_banner();
+    kprintf("\n");
+    shell_init();
+    shell_run();
+
+    while(1) {
+        hlt();	
+    }
+}
