@@ -24,7 +24,8 @@ initramfs files: `initramfs/`
 
 Documentation: `doc/`
 
-Branches:
+**Branches information**:
+
 `main` -- main branch
 
 `test` -- rc (Release-Candidate) branch
