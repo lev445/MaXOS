@@ -35,11 +35,13 @@ start:
 disk_error:
 	mov si, msg_disk_err
 	call print16
+
+; tools functions
 .halt:
 	cli
 	hlt
 	jmp .halt
-; tools functions
+
 print16:
 	pusha
 	mov ah, 0x0E
@@ -54,7 +56,7 @@ print16:
 	popa
 	ret
 
-; data section
+; -- data section --
 msg_hello: db "[S1], welcome to maxos. Loading stage2.",13,10,0
 msg_disk_err: db "[S1, fatal]: cannot read stage2 from disk. Maybe error in dap, or stage2 not found.",13,10,0
 

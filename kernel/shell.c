@@ -764,8 +764,36 @@ static int cmd_lscpu(int argc, char **argv) {
     
     return 0;
 }
-void shell_banner(void)
-{
+
+static int fetch(int argc, char **argv) {
+	(void)argc; (void)argv; 
+	uint32_t eax, ebx, ecx, edx;
+	uint64_t total, used, free;
+	char brand[49];
+	char vendor[13];
+	memcpy(vendor + 0, &ebx, 4);
+	memcpy(vendor + 4, &edx, 4);
+	memcpy(vendor + 8, &ecx, 4);
+	vendor[12] = '\0';
+	cpuid_get_brand(brand);
+	pmm_get_stats(&total, &used, &free);
+	uint64_t total_mb = total / (1024 * 1024);
+	uint64_t used_mb = used / (1024 * 1024);
+	uint64_t free_mb = free / (1024 * 1024);
+	uint64_t ms = uptime_ms();
+	uint64_t s = ms / 1000;
+	kprintf("OS: MaXOS, 0.1.0\n");
+	kprintf("Kernel: MaXKernel\n");
+	kprintf("CPU: %s\n", brand);
+	kprintf("RAM: %lu MiB\n", total_mb);
+	kprintf("Uptime: %02lu\n",
+	        (unsigned long)(s / 3600), (unsigned long)((s / 60) % 60),
+	        (unsigned long)(s % 60), (unsigned long)pit_ticks(), PIT_HZ);
+	
+	return 0;
+}
+
+void shell_banner(void) {
     for (int i = 0; i < 1; i++) {
         int x, y;
         console_get_cursor(&x, &y);
@@ -808,15 +836,15 @@ void shell_init(void) {
     shell_register("xxd", "hex dump of file", c_xxd);
     shell_register("file", "determine file type", c_file);
     shell_register("panic", "via 'ud2' return panic", c_panic);
+    shell_register("fetch", "fastfetch analogue", fetch);
 }
 
 
 
-void shell_run(void)
-{
+void shell_run(void) {
     console_cursor_visible(1);
     new_prompt();
-    for (;;) {
+    while (1) {
         int c = wait_key();
         switch (c) {
         case '\n':

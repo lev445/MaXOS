@@ -6,15 +6,15 @@ default rel
 section .text
 global _start
 _start:
-    mov rax, 1              ; SYS_PUTC
-    mov rdi, '1 '
-    syscall
+    ;mov rax, 1              ; SYS_PUTC
+    ;mov rdi, '1 '
+    ;syscall
     
     syscall_write msg, msg.len
-    mov rax, 1
-    mov rdi, '2 '
-    syscall
-    
+    ;mov rax, 1
+    ;mov rdi, '2 '
+    ;syscall
+       
     syscall_write msg2, msg2.len
     
     syscall_exit 42

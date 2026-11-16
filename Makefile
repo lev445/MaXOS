@@ -38,13 +38,9 @@ KOBJS     = $(KASM_OBJS) $(KC_OBJS)
 kernel/%.o: kernel/%.s
 	as $< -o $@
 
-# BUGFIX: .incbin "initramfs.cpio" не создаёт зависимости для make.
-# Без этой строки пересборка initramfs.cpio НЕ пересобирала ядро,
-# и в образ молча уезжал старый архив.
 kernel/initramfs_.o: kernel/initramfs_.s initramfs.cpio
 	as $< -o $@
 
-# пересборка архива из каталога initramfs/
 initramfs.cpio: $(shell find initramfs -type f)
 	( cd initramfs && find . | LC_ALL=C sort | cpio -o -H newc --quiet ) > $@
 
@@ -81,7 +77,7 @@ log: os.img
 	$(QEMU) -drive file=$<,format=raw -m 128M -no-reboot -debugcon stdio \
 	        -d int,cpu_reset -D qemu.log
 
-# debug (via gdb)
+# debug (with gdb)
 debug: os.img
 	$(QEMU) -drive file=$<,format=raw -m 128M -no-reboot -s -S -debugcon stdio &
 	@echo "----- QEMU is started via gdb-debug. Use:"
