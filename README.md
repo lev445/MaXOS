@@ -1,6 +1,8 @@
 # MaXOS
 **MaXOS** -- an open-source operating system
+
 Created by github.com/lev445.
+
 Also thanks for: github.com/Master-Kaban.
 
 # Navigation
