@@ -38,6 +38,7 @@ Thanks for support MaXOS.
 # How build
 WORK NORMALLY ONLY ON `LINUX/UNIX-LIKE` OS.
 If you in Windows, please, use `WSL`.
+
 `make` -- build project
 
 `make run` -- run project in QEMU
