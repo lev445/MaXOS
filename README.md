@@ -59,7 +59,7 @@ After build, you can find `os.img` in root-project folder.
 
 `GNU Make` -- for `makefile`
 
-**run in make run**
+**Run in make run**
 
 `qemu-system-x86_64` -- if you want run MaXOS in qemu (Or download `qemu-full`)
 
