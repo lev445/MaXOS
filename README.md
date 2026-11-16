@@ -48,14 +48,19 @@ After build, you can find `os.img` in root-project folder.
 
 # Requirements
 **Assembler**
+
 `NASM` -- for bootloder and another kernel code (Using how main assembly)
+
 `GNU assembly` -- less than half is used in the kernel
 
 **Compilation main code**
+
 `GCC` -- for compiling C code
+
 `GNU Make` -- for `makefile`
 
 **run in make run**
+
 `qemu-system-x86_64` -- if you want run MaXOS in qemu (Or download `qemu-full`)
 
 # License
